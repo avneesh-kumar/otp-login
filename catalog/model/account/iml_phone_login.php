@@ -3,7 +3,8 @@
 namespace Opencart\Catalog\Model\Extension\Imlphonelogin\Account;
 
 class Imlphonelogin extends \Opencart\System\Engine\Model {
-    public function getCustomerByPhoneNumber($number, $email){
+
+    public function getCustomerByMailAndNumber($number, $email){
         $query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "customer` WHERE `telephone` = '".$number."' AND LCASE(`email`) = '" . $this->db->escape(oc_strtolower($email)) . "' ")->row;
 
         return $query;

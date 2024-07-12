@@ -5,9 +5,6 @@ use Twilio\Rest\Client;
 
 class Imlphonelogin extends \Opencart\System\Engine\Controller {
 
-    // private  $serviceSid = $this->config->get('module_iml_phone_login_service_sid');
-    // private $accountSid = $this->config->get('module_iml_phone_login_sid');
-    // private $authToken = $this->config->get('module_iml_phone_login_auth_token');
     private $serviceSid;
     private $accountSid;
     private $authToken;
@@ -44,6 +41,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
 
         $data['sentOtp'] = $this->url->link("extension/iml_phone_login/account/iml_phone_login.sendOtp");
 
+        $data['language'] = $this->config->get('config_language');
 		$data['register'] = $this->url->link('account/register', 'language=' . $this->config->get('config_language'));
 		$data['forgotten'] = $this->url->link('account/forgotten', 'language=' . $this->config->get('config_language'));
 
@@ -83,7 +81,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
         $data['email'] = $email = $this->request->post["email"];    
 
         $this->load->model('extension/iml_phone_login/account/iml_phone_login');
-        $result = $this->model_extension_iml_phone_login_account_iml_phone_login->getCustomerByPhoneNumber($number, $email);
+        $result = $this->model_extension_iml_phone_login_account_iml_phone_login->getCustomerByMailAndNumber($number, $email);
 
         if(empty($result)){
             $data['register'] = $this->url->link("extension/iml_phone_login/account/iml_phone_login.register");
@@ -141,7 +139,17 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
         if($verification_check->valid){
 
             $this->load->model('account/customer');
-			$customer_info = $this->model_account_customer->getCustomerByEmail($this->request->post['email']);
+            $this->load->model('extension/iml_phone_login/account/iml_phone_login');
+
+			$customer_info = $this->model_extension_iml_phone_login_account_iml_phone_login->getCustomerByMailAndNumber($this->request->post['telephone'], $this->request->post['email']);
+
+            if ($customer_info && !$customer_info['status']) {
+				$json['error']['warning'] = $this->language->get('error_approved');
+			} elseif (!$this->customer->login($this->request->post['email'], $this->request->post['telephone'], ENT_QUOTES, 'UTF-8')) {
+				$json['error']['warning'] = $this->language->get('error_login');
+
+				$this->model_account_customer->addLoginAttempt($this->request->post['email']);
+			}
 
             if (!$json) {
                 // Add customer details into session
@@ -171,7 +179,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
                         unset($this->session->data['wishlist'][$key]);
                     }
                 }
-    
+
                 // Log the IP info
                 $this->model_account_customer->addLogin($this->customer->getId(), $this->request->server['REMOTE_ADDR']);
     
@@ -184,7 +192,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
                 if (isset($this->request->post['redirect']) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false)) {
                     $json['redirect'] = str_replace('&amp;', '&', $this->request->post['redirect']) . '&customer_token=' . $this->session->data['customer_token'];
                 } else {
-                    $json['redirect'] = $this->url->link('account/account', 'language=' . $this->config->get('config_language') . '&customer_token=' . $this->session->data['customer_token'], true);   
+                    $json['redirect'] = $this->url->link('account/account', 'language=' . $this->config->get('config_language') . '&customer_token=' . $this->session->data['customer_token'], true);
                 }
             }
         }
@@ -199,7 +207,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
 
         $data['verification'] = $this->otp($this->request->post['telephone']);
 
-        // $result = $this->model_extension_iml_phone_login_account_iml_phone_login->register($this->request->post);
+        $this->model_extension_iml_phone_login_account_iml_phone_login->register($this->request->post);
 
         return $this->load->view('extension/iml_phone_login/account/iml_phone_login_verify',$data);
     }
