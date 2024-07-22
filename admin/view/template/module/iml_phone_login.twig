@@ -22,24 +22,24 @@
             <div class="card-body">
                 <form id="form-module" action="{{ save }}" method="post" data-oc-toggle="ajax">
                     
-                    <div class="row mb-3">
-                        <label class="col-sm-2 col-form-label">Account SID</label>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label">{{ text_account_sid }}</label>
                         <div class="col-sm-10">
-                            <input type="text" name="module_iml_phone_login_sid" value="{{ module_iml_phone_login_sid }}" placeholder="Enter SID" id="input-name" class="form-control"/>
+                            <input type="text" name="module_iml_phone_login_sid" value="{{ module_iml_phone_login_sid }}" placeholder="Enter {{ text_account_sid }}" id="input-name" class="form-control" required/>
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <label class="col-sm-2 col-form-label">Auth Token</label>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label">{{ text_auth_token }}</label>
                         <div class="col-sm-10">
-                            <input type="text" name="module_iml_phone_login_auth_token" value="{{ module_iml_phone_login_auth_token }}" placeholder="Enter Auth Token" id="input-name" class="form-control"/>
+                            <input type="text" name="module_iml_phone_login_auth_token" value="{{ module_iml_phone_login_auth_token }}" placeholder="Enter {{ text_auth_token }}" id="input-name" class="form-control" required/>
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <label class="col-sm-2 col-form-label">Service SID</label>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label">{{ text_service_sid }}</label>
                         <div class="col-sm-10">
-                            <input type="text" name="module_iml_phone_login_service_sid" value="{{ module_iml_phone_login_service_sid }}" placeholder="Enter SID" id="input-name" class="form-control"/>
+                            <input type="text" name="module_iml_phone_login_service_sid" value="{{ module_iml_phone_login_service_sid }}" placeholder="Enter {{ text_service_sid }}" id="input-name" class="form-control" required/>
                         </div>
                     </div>                   
 
@@ -50,7 +50,11 @@
                                 <input type="hidden" name="module_iml_phone_login_status" value="0"/>
                                 <input type="checkbox" name="module_iml_phone_login_status" value="1" id="input-status" class="form-check-input"{% if module_iml_phone_login_status %} checked{% endif %}/>
                             </div>
+
                         </div>
+                    </div>
+                    <div class="float-end">
+                        <a href="https://www.twilio.com/en-us"  target="_blank" class="float-end">Visit twilio.com! to setup account</a>
                     </div>
                 </form>
             </div>

@@ -17,102 +17,60 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
         $this->authToken = $this->config->get('module_iml_phone_login_auth_token');
     }
 
-    public function index(){
-        $this->load->language('account/login');
-
-		$this->document->setTitle($this->language->get('heading_title'));
-
-        $data['breadcrumbs'] = [];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_account'),
-			'href' => $this->url->link('account/account', 'language=' . $this->config->get('config_language'))
-		];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_login'),
-			'href' => $this->url->link('account/login', 'language=' . $this->config->get('config_language'))
-		];
-
-        $data['sentOtp'] = $this->url->link("extension/iml_phone_login/account/iml_phone_login.sendOtp");
-
-        $data['language'] = $this->config->get('config_language');
-		$data['register'] = $this->url->link('account/register', 'language=' . $this->config->get('config_language'));
-		$data['forgotten'] = $this->url->link('account/forgotten', 'language=' . $this->config->get('config_language'));
-
-        $data['column_left'] = $this->load->controller('common/column_left');
-		$data['column_right'] = $this->load->controller('common/column_right');
-		$data['content_top'] = $this->load->controller('common/content_top');
-		$data['content_bottom'] = $this->load->controller('common/content_bottom');
-		$data['footer'] = $this->load->controller('common/footer');
-		$data['header'] = $this->load->controller('common/header');
-		$this->response->setOutput($this->load->view('extension/iml_phone_login/account/iml_phone_login', $data));
-    }
-
     public function sendOtp(){
+        $this->load->language("extension/iml_phone_login/account/iml_phone_login");
 
-        $this->load->language('account/login');
+        $json = [];
 
-		$this->document->setTitle($this->language->get('heading_title'));
+        $number = $this->request->post['login'];
 
-        $data['breadcrumbs'] = [];
+        if(empty($number)){
+            $json['error'] =  $this->language->get('text_error');
+        }
+        
+        if(!$json){
+            $sid    = $this->accountSid;
+            $token  = $this->authToken;
+    
+            $twilio = new Client($sid, $token);
+    
+            $verification = $twilio->verify->v2->services($this->serviceSid)->verifications->create($number, "sms");
 
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_account'),
-			'href' => $this->url->link('account/account', 'language=' . $this->config->get('config_language'))
-		];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_login'),
-			'href' => $this->url->link('account/login', 'language=' . $this->config->get('config_language'))
-		];
-
-        $data['number'] = $number = $this->request->post["phone"];
-        $data['email'] = $email = $this->request->post["email"];    
-
-        $this->load->model('extension/iml_phone_login/account/iml_phone_login');
-        $result = $this->model_extension_iml_phone_login_account_iml_phone_login->getCustomerByMailAndNumber($number, $email);
-
-        if(empty($result)){
-            $data['register'] = $this->url->link("extension/iml_phone_login/account/iml_phone_login.register");
-
-        } else {
-            $status = $this->otp($number);
-            if($status){
-                $data['verification'] = $status;
-                $data['verify'] = $this->url->link("extension/iml_phone_login/account/iml_phone_login.verifyOtp");
-            }
+            $json['to']  = $verification->to;
+            $json['massage'] = $this->language->get('text_success');
         }
 
-        $data['column_left'] = $this->load->controller('common/column_left');
-        $data['column_right'] = $this->load->controller('common/column_right');
-        $data['content_top'] = $this->load->controller('common/content_top');
-        $data['content_bottom'] = $this->load->controller('common/content_bottom');
-        $data['footer'] = $this->load->controller('common/footer');
-        $data['header'] = $this->load->controller('common/header');
-
-        $this->response->setOutput($this->load->view('extension/iml_phone_login/account/iml_phone_login_verify',$data));
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
     }
 
-    public function otp($number){
-        $sid    = $this->accountSid;
-        $token  = $this->authToken;
+    public function otp(){
+        $this->load->language("extension/iml_phone_login/account/iml_phone_login");
 
-        $twilio = new Client($sid, $token);
+        $json = [];
 
-        $verification = $twilio->verify->v2->services($this->serviceSid)->verifications->create($number, "sms");
+        if(empty($this->request->post["telephone"])){
+            $json['error'] = $this->language->get("text_resend_error");
+        }
 
-        return $verification->status;
+        if(!$json){
+
+            $number = $this->request->post["telephone"];
+            
+            $sid    = $this->accountSid;
+            $token  = $this->authToken;
+            
+            $twilio = new Client($sid, $token);
+            
+            $verification = $twilio->verify->v2->services($this->serviceSid)->verifications->create($number, "sms");
+
+            if($verification->status){
+                $json['success'] = $this->language->get("text_resend_success");
+            }
+        }
+        
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
     }
 
     public function verifyOtp(){
@@ -121,8 +79,8 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
 
         $json = [];
 
+        $code = $this->request->post["otp"];
         $number = $this->request->post["telephone"];
-        $code = $this->request->post["code"];
 
         $twilio = new Client($this->accountSid, $this->authToken);
 
@@ -132,8 +90,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
         ]);
 
         if(!$verification_check->valid){
-            $json['error']['warning'] = $this->language->get('error_invalid_otp');
-			// $json['redirect'] = $this->url->link('account/login', 'language=' . $this->config->get('config_language'), true);
+            $json['error'] = $this->language->get('error_invalid_otp');
         }
 
         if($verification_check->valid){
@@ -141,14 +98,16 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
             $this->load->model('account/customer');
             $this->load->model('extension/iml_phone_login/account/iml_phone_login');
 
-			$customer_info = $this->model_extension_iml_phone_login_account_iml_phone_login->getCustomerByMailAndNumber($this->request->post['telephone'], $this->request->post['email']);
+			$customer_info = $this->model_extension_iml_phone_login_account_iml_phone_login->getCustomerByNumber($this->request->post['telephone']);
 
-            if ($customer_info && !$customer_info['status']) {
+            if (empty($customer_info)) {
+                $json['error'] = $this->language->get('text_error_data_empty');
+            } elseif ($customer_info && !$customer_info['status']) {
 				$json['error']['warning'] = $this->language->get('error_approved');
-			} elseif (!$this->customer->login($this->request->post['email'], $this->request->post['telephone'], ENT_QUOTES, 'UTF-8')) {
+			} elseif (!$this->customer->login($customer_info['email'], $this->request->post['telephone'], ENT_QUOTES, 'UTF-8')) {
 				$json['error']['warning'] = $this->language->get('error_login');
 
-				$this->model_account_customer->addLoginAttempt($this->request->post['email']);
+				$this->model_account_customer->addLoginAttempt($customer_info['email']);
 			}
 
             if (!$json) {
@@ -185,9 +144,9 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
     
                 // Create customer token
                 $this->session->data['customer_token'] = oc_token(26);
-    
-                $this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
-    
+
+                $this->model_account_customer->deleteLoginAttempts($customer_info['email']);
+
                 // Added strpos check to pass McAfee PCI compliance test (http://forum.opencart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
                 if (isset($this->request->post['redirect']) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false)) {
                     $json['redirect'] = str_replace('&amp;', '&', $this->request->post['redirect']) . '&customer_token=' . $this->session->data['customer_token'];
@@ -199,16 +158,5 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller {
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
-    }
-
-    public function register(){
-
-        $this->load->model('extension/iml_phone_login/account/iml_phone_login');
-
-        $data['verification'] = $this->otp($this->request->post['telephone']);
-
-        $this->model_extension_iml_phone_login_account_iml_phone_login->register($this->request->post);
-
-        return $this->load->view('extension/iml_phone_login/account/iml_phone_login_verify',$data);
     }
 }
