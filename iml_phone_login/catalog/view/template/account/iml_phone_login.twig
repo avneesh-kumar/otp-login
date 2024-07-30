@@ -18,11 +18,10 @@
 					<form id="form-login" action="{{ sentOtp }}" method="post" data-oc-toggle="ajax">
 						<div class="mb-3 d-flex flex-column">
 							<label for="phone" class="form-label text-start"><strong>{{ text_phone_number }}</strong></label>
-							<input type="tel" id="phone" name="phone" class="form-control" title="Enter Phone Number With out Country Code" required>
-							<input type="hidden" id="number" name="phone-hid" value="" class="form-control" >
+							<input type="tel" id="phone" name="phone" class="form-control">
+							<input type="hidden" id="number" name="phone-hid" value="" class="form-control">
 						</div>
 						<div class="alert alert-info text-start" style="display: none;"></div>
-
 						<div class="text-end">
 							<button type="submit" class="btn btn-primary" id="btn-send" title="{{ text_btn_otp_send }}">{{ text_btn_otp_send }}</button>
 						</div>
@@ -46,9 +45,8 @@
                         <div class="mb-3 d-flex flex-column">
                             <label for="otp" class="form-label text-start"><strong>OTP</strong></label>
                             <input type="text" id="otp" name="otp" class="form-control" required>
+						<div class="form-text text-start"><a href="#" class="form-label text-start" data-bs-toggle="tooltip" id="otp-resend">Resend OTP</a></div>
                         </div>
-						<a href="#" class="form-label text-start" data-bs-toggle="tooltip" title="OTP resend" id="otp-resend">Resend OTP</a>
-
                         <div class="alert alert-info text-start" id="otp-alert" style="display: none;"></div>
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary" id="btn-verify" title="Verify OTP">Verify OTP</button>
@@ -71,7 +69,7 @@
 		utilsScript:
 		"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
 	});
-	
+
 	const info = document.querySelector(".alert-info");
 	const otpAlert = document.querySelector("#otp-alert");
 
@@ -112,7 +110,7 @@
 		} else {
 			event.preventDefault();
 			info.style.display = "block";
-			info.innerHTML = `<strong>Invalid phone number.</strong><button type="button" class="btn-close float-end" data-bs-dismiss="alert"></button>`;
+			info.innerHTML = `<strong>Invalid phone number.</strong>`;
 		}
 	});
 
@@ -133,7 +131,7 @@
             success: function (json) {
                 if (json['error']) {
 					otpAlert.style.display = "block";
-					otpAlert.innerHTML = `<strong>`+ json['error'] + `</strong><button type="button" class="btn-close float-end" data-bs-dismiss="alert"></button>`;
+					otpAlert.innerHTML = `<strong>`+ json['error'] + `</strong>`;
                 }
 
 				if (json['redirect']) {
@@ -151,6 +149,8 @@
 	$("#otp-resend").on("click", function(event){
         event.preventDefault();
 		let number = $('#number').val();
+		$("#otp").val('');
+
 		$.ajax({
             url: 'index.php?route=extension/iml_phone_login/account/iml_phone_login.otp',
             type: 'post',
@@ -159,12 +159,12 @@
 			success: function (json) {
 				if(json['error']) {
 					otpAlert.style.display = "block";
-					otpAlert.innerHTML = `<strong>`+ json['error'] +`</strong><button type="button" class="btn-close float-end" data-bs-dismiss="alert"></button>`;
+					otpAlert.innerHTML = `<strong>`+ json['error'] +`</strong>`;
 				}
 
-				if(json['succes']){
+				if(json['success']){
 					otpAlert.style.display = "block";
-					otpAlert.innerHTML = `<strong>` + json['success'] + `</strong><button type="button" class="btn-close float-end" data-bs-dismiss="alert"></button>`;
+					otpAlert.innerHTML = `<strong>` + json['success'] + `</strong>`;
 				}
 			}
 		});

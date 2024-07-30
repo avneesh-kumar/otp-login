@@ -31,4 +31,9 @@ class Imlphonelogin extends \Opencart\System\Engine\Model {
         
 		return $customer_id;
     }
+
+	public function getTelephone($customer_id){
+		$query = $this->db->query("SELECT `telephone` FROM `" . DB_PREFIX . "customer` WHERE `customer_id` = '" . (int)$customer_id . "'");
+		return $query->row['telephone'];
+	}
 }

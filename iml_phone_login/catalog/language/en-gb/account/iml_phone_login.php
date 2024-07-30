@@ -29,5 +29,4 @@ $_['text_resend_error'] = 'Unable to send OTP Go back and try again after some t
 $_['text_resend_success'] = 'OTP Sent Again';
 $_['text_error_data_empty'] = 'user not found';
 
-$_['heading_title_register'] = 'Register Account';  
-$_['text_btn_register'] = 'Register';
+$_['entry_telephone']    = 'Telephone';

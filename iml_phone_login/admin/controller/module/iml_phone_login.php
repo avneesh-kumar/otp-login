@@ -73,6 +73,24 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller{
             'status' => true,
             'sort_order' => 0
 		]);
+
+        $this->model_setting_event->addEvent([
+            'code' => 'module_iml_phone_login_editNumber',
+            'description' => 'This is IML Phone Login event for customer to edit telephone',
+            'trigger' => 'catalog/view/account/edit/after',
+            'action' => 'extension/iml_phone_login/event/iml_phone_login_editnumber',
+            'status' => true,
+            'sort_order' => 0
+		]);
+        
+        $this->model_setting_event->addEvent([
+            'code' => 'module_iml_phone_login_registerNumber',
+            'description' => 'This is IML Phone Login event for customer to register telephone',
+            'trigger' => 'catalog/view/account/register/after',
+            'action' => 'extension/iml_phone_login/event/iml_phone_login_registernumber',
+            'status' => true,
+            'sort_order' => 0
+		]);
 	}
 
 	public function uninstall(){
@@ -82,5 +100,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller{
     protected function __unregisterEvents(){
         $this->load->model('setting/event');
 		$this->model_setting_event->deleteEventByCode('module_iml_phone_login');
+		$this->model_setting_event->deleteEventByCode('module_iml_phone_login_editNumber');
+		$this->model_setting_event->deleteEventByCode('module_iml_phone_login_registerNumber');
 	}
 }
