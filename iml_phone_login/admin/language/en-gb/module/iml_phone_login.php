@@ -1,6 +1,6 @@
 <?php
 
-$_['heading_title']     = 'Phone Login';
+$_['heading_title']     = 'IML OTP Login';
 $_['entry_status']      = 'Status';
 
 $_['text_extension']    = 'Extension';

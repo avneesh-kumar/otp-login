@@ -8,7 +8,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller{
         
         $this->load->language("extension/iml_phone_login/account/iml_phone_login");
 
-        $link = $this->url->link("extension/iml_phone_login/account/iml_phone_login", 'language=' . $this->config->get('config_language'));
+        // $link = $this->url->link("extension/iml_phone_login/account/iml_phone_login", 'language=' . $this->config->get('config_language'));
 
         if($this->config->get('module_iml_phone_login_status')){
             $layout = $this->load->view("extension/iml_phone_login/account/iml_phone_login",[

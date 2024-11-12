@@ -36,7 +36,7 @@ class Imlphonelogin extends \Opencart\System\Engine\Controller{
 
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
-        $data['footer'] = $this->load->view('common/footer');
+        $data['footer'] = $this->load->controller('common/footer');
 
         $this->response->setOutput($this->load->view('extension/iml_phone_login/module/iml_phone_login', $data));
     }
