@@ -1,0 +1,97 @@
+{{ header }}
+<div id="account-login" class="container">
+	<ul class="breadcrumb">
+		{% for breadcrumb in breadcrumbs %}
+			<li class="breadcrumb-item">
+				<a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+			</li>
+		{% endfor %}
+	</ul>
+	<div class="row">{{ column_left }}
+		<div id="content" class="col">{{ content_top }}
+			<div class="row">
+				<div class="col mb-3">
+					<div class="border rounded p-3 d-flex flex-column h-100">
+						{% if verification %}
+							<form id="form-login-verify" action="{{ verify }}" method="post" data-oc-toggle="ajax">
+								<div class="row mb-3">
+									<label for="phone" class="col-sm-2 col-form-label">
+										<strong>{{ text_enter_otp }}</strong>
+									</label>
+									<div class="col-sm-10">
+										<input type="text" id="code" name="code" class="form-control" placeholder="{{ text_enter_otp }}">
+										{% if not register_data %}
+											<input type="hidden" id="number" name="telephone" value="{{ number }}" class="form-control" >
+										{% endif %}
+										{% if register_data %}
+											{% for user in register_data %}
+												<input type="hidden" name="firstname" value="{{ user.firstname }}" class="form-control" >
+												<input type="hidden" name="lastname" value="{{ user.lastname }}" class="form-control" >
+												<input type="hidden" name="password" value="{{ user.password }}" class="form-control" >
+												<input type="hidden" name="telephone" value="{{ user.number }}" class="form-control" >
+												<input type="hidden" name="email" value="{{ user.email }}" class="form-control" >
+											{% endfor %}
+										{% endif %}
+									</div>
+								</div>
+								<div class="text-end">
+									<button type="submit" class="btn btn-primary">{{ text_submit_otp }}</button>
+								</div>
+							</form>
+						{% endif %}
+						{% if register %}
+							<form method="post" action="{{ register }}" accept-charset="UTF-8">
+								<h2>{{ heading_title_register }}</h2>
+								<p>
+									<strong><hr></strong>
+								</p>
+								<div class="row mb-3 required">
+									<label for="username" class="col-sm-2 col-form-label">{{ text_first_name }}</label>
+									<div class="col-sm-10">
+										<input id="fName" type="text" name="firstname" value="" class="form-control" placeholder="Enter {{ text_first_name }}" required>
+									</div>
+								</div>
+								
+								<div class="row mb-3 required">
+									<label for="username" class="col-sm-2 col-form-label">{{ text_last_name }}</label>
+									<div class="col-sm-10">
+										<input id="lName" type="text" name="lastname" value="" class="form-control" placeholder="Enter {{ text_last_name }}" required>
+									</div>
+								</div>
+
+								<div class="row mb-3 required">
+									<label for="email" class="col-sm-2 col-form-label">{{ text_eamil_address }}</label>
+									<div class="col-sm-10">
+										<input id="email" type="email" name="email" value="{{ email }}" class="form-control" placeholder="Enter {{ text_eamil_address }}" required>
+									</div>
+								</div>
+								
+								<div class="row mb-3 required">
+									<label for="email" class="col-sm-2 col-form-label">{{ text_phone_number }}</label>
+									<div class="col-sm-10">
+										<input id="phone" type="tel" name="telephone" value="{{ number }}" class="form-control" placeholder="Enter {{ text_phone_number }}" required>
+									</div>
+								</div>
+
+								<div class="row mb-3 required">
+								<label for="password" class="col-sm-2 col-form-label">{{ text_password }}</label>
+									<div class="col-sm-10">
+										<input id="password" type="password" name="password" class="form-control" placeholder="Enter {{ text_password }}" required>
+									</div>
+								</div>
+
+								<div class="text-end">
+									<button type="submit" class="btn btn-primary">{{ text_btn_register }}</button>
+								</div>
+								{% if redirect %}
+									<input type="hidden" name="redirect" value="{{ redirect }}"/>
+								{% endif %}
+							</form>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+        {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}
